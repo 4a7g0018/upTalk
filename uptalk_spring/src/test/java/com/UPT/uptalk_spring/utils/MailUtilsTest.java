@@ -10,14 +10,14 @@ import javax.mail.MessagingException;
 /**
  * 郵件發送測試
  *
- * @Title: MaiUtilsTest
+ * @Title: MailUtilsTest
  * @author: Benson-Yan
  * @version: 1.0.0
  * @time: 2022/5/12
  */
 
 @SpringBootTest
-public class MaiUtilsTest {
+public class MailUtilsTest {
 
     @Autowired
     private IMailUtils mailUtils;
