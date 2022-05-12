@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.mail.MessagingException;
+
 /**
  * 郵件發送測試
  *
@@ -30,6 +32,19 @@ public class MaiUtilsTest {
         }catch (RuntimeException ex){
             ex.printStackTrace();
         }
+    }
 
+    @Test
+    public void TestSendHtmlAuthentication(){
+        String to = "yan19991203@gmail.com";
+        String authenticationCode = "abcdefghijklmnopqrstuvwxyz";
+
+        try{
+            this.mailUtils.sendHtmlAuthentication(to,authenticationCode);
+        }catch (RuntimeException ex){
+            ex.printStackTrace();
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
