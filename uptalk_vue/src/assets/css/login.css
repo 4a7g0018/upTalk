@@ -1,0 +1,112 @@
+body {
+    margin: 0px;
+    padding: 0px;
+    background: url("../../assets/img/login_bg.jpg") no-repeat;
+    background-position: center;
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    position: fixed;
+    z-index:1;
+}
+#bgimg{
+    margin: 0px;
+    padding: 0px;
+    position: fixed;
+    background: #E5E5E5;
+    background-position: center;
+    background-size: cover;
+    background-repeat:no-repeat;
+    height: 100%;
+    width: 100%;
+    opacity: 0.5;
+    z-index:2; 
+}
+img{
+    text-align: center;
+    width: 150px;
+    height: 65px;
+}
+input {
+    padding:5px 15px;
+    width: 200px;
+    background:rgba(153, 153, 153, 0.1);
+    border: 1px solid #919191;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px; 
+}
+a{
+    color: #00A3FF;
+    text-decoration:none;
+    cursor: pointer;
+}
+a:hover {
+    color:gray;
+    
+}
+.login-container { 
+    position: absolute;
+    left: 800px;
+    top: 20px;
+    border-radius: 40px;
+    text-align: center;
+    background-clip: padding-box;
+    margin: 90px auto;
+    width: 225px;
+    height: 350px;
+    padding: 35px 35px 35px 35px;
+    background: #ffffffd2;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.30),0 17px 50px 0 rgba(0,0,0,0.19);
+    z-index:3;
+}
+.label_title{
+    margin: 0px auto 30px auto;
+    text-align: left;
+    color: black;
+}
+.textbox{
+    text-align: left;
+    margin-left:auto;
+    margin-right: auto;
+    /* margin: 0 auto; */
+}
+.l-button {
+    background-color: #F0F0F0;
+    border: 1px solid black;
+    width: 150px;
+    height: 30px;
+    color: black;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+	border-radius: 27.5px;
+	-webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+	box-shadow: 0 4px #999;
+}
+.l-button:hover {
+    background-color: #E0E0E0;
+    color: black;
+	box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.l-button:active {
+    background-color: #E0E0E0;
+    box-shadow: 0 2px #666;
+    transform: translateY(5px);
+}
+.fade-enter-active{
+    transition: all .3s ease;
+}
+.fade-leave-active {
+    transition: all .2s cubic-bezier(0.5, 0.2, 0.2, 1.0);;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    transform: translateX(80px);
+    opacity: 0;
+}
