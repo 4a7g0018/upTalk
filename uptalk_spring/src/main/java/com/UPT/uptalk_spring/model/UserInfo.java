@@ -30,18 +30,26 @@ public class UserInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name",nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "email" ,nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password" ,nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "enable",nullable = false)
+    @Column(name = "enable", nullable = false)
     private boolean enable;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
+
+    public UserInfo(String name, String email, String password, boolean enable, Collection<Role> roles) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.enable = enable;
+        this.roles = roles;
+    }
 }
