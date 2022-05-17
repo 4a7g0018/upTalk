@@ -1,40 +1,20 @@
 package com.UPT.uptalk_spring.model;
 
+import com.UPT.uptalk_spring.service.IRoomService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-
 /**
- * 存放 user 帳號資訊
- *
  * @Title: User
- * @author: Benson-Yan
+ * @author: David-Liao
  * @version: 1.0.0
- * @time: 2022/5/11
+ * @time: 2022/5/18
  */
-
-@Entity
-@Table(name = "user_info")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "name",nullable = false)
-    private String name;
-
-    @Column(name = "email" ,nullable = false)
-    private String email;
-
-    @Column(name = "password" ,nullable = false)
-    private String password;
-
-    @Column(name = "enable",nullable = false)
-    private boolean enable;
+    private IRoomService roomService;
+    private UserInfo userInfo;
 }
