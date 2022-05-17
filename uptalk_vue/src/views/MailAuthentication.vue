@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1>authentication</h1>
+    <img src = "../assets/img/logo_icon.png"/>
+    <div>
+      
+    </div>
   </div>
 </template>
 

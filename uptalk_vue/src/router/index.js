@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Index from '../views/IndexView.vue'
+// import '@/assets/css/login.css'
 
 Vue.use(VueRouter)
 
