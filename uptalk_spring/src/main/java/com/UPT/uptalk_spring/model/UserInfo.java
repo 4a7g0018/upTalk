@@ -1,15 +1,18 @@
 package com.UPT.uptalk_spring.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * 存放 user 帳號資訊
  *
- * @Title: User
+ * @Title: UserInfo
  * @author: Benson-Yan
  * @version: 1.0.0
  * @time: 2022/5/11
@@ -20,7 +23,8 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+@Builder
+public class UserInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +41,7 @@ public class User {
 
     @Column(name = "enable",nullable = false)
     private boolean enable;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Collection<Role> roles = new ArrayList<>();
 }
