@@ -23,36 +23,36 @@ import java.util.Collection;
 @Slf4j
 public class UserRepositoryTest {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
+//    @Autowired
+//    private UserRepository userRepository;
+//
+//    @Autowired
+//    private RoleRepository roleRepository;
 
     @Test
     public void saveTest() {
-        Role member = new Role("member");
-        Role admin = new Role("admin");
-        this.roleRepository.save(member);
-        this.roleRepository.save(admin);
-
-        Collection<Role> roles = new ArrayList<>();
-        roles.add(member);
-        roles.add(admin);
-
-        UserInfo user = UserInfo.builder()
-                .name("name")
-                .email("email")
-                .password("1234")
-                .enable(true)
-                .roles(roles).build();
-
-        this.userRepository.save(user);
+//        Role member = new Role("member");
+//        Role admin = new Role("admin");
+//        this.roleRepository.save(member);
+//        this.roleRepository.save(admin);
+//
+//        Collection<Role> roles = new ArrayList<>();
+//        roles.add(member);
+//        roles.add(admin);
+//
+//        UserInfo user = UserInfo.builder()
+//                .name("name")
+//                .email("email")
+//                .password("1234")
+//                .enable(true)
+//                .roles(roles).build();
+//
+//        this.userRepository.save(user);
     }
 
     @Test
     public void findUserTest() {
-        UserInfo user = this.userRepository.findUserInfoByEmail("email");
-        log.info("user : {}",user);
+//        UserInfo user = this.userRepository.findUserInfoByEmail("email");
+//        log.info("user : {}",user);
     }
 }

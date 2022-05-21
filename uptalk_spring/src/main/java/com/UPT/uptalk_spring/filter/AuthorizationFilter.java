@@ -31,12 +31,26 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         //略過不認證權限的 URL
         // LOGIN_URL : /api/login
         // REFRESH_TOKEN_URL : /api/token/refresh
-        if (request.getRequestURI().equals(LOGIN_URL) || request.getRequestURL().equals(REFRESH_TOKEN_URL)) {
+
+        String path = request.getRequestURI();
+        // 刪除 url 因 war 檔檔名變長的部分
+        int warNameLength=path.substring(1).indexOf('/')+1;
+        path=path.substring(warNameLength);
+
+        if (path.equals(LOGIN_URL) || path.equals(REFRESH_TOKEN_URL)) {
             filterChain.doFilter(request, response);
         } else {
             //JWT驗證

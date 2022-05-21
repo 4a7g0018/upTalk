@@ -14,9 +14,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static com.UPT.uptalk_spring.filter.AuthenticationFilter.LOGIN_URL;
 
 
 /**
@@ -48,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/api/login").permitAll();
+        http.authorizeRequests().antMatchers(LOGIN_URL).permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/user/**").hasAnyAuthority("member");
         http.authorizeRequests().anyRequest().permitAll();
         http.addFilter(new AuthenticationFilter(this.authenticationManagerBean()));
