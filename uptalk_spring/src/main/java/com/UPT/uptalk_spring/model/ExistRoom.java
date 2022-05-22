@@ -23,7 +23,6 @@ import javax.persistence.*;
 public class ExistRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "room_number")
     private Integer roomNumber;
 }
