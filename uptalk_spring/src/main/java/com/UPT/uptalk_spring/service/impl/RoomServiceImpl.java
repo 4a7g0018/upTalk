@@ -2,12 +2,9 @@ package com.UPT.uptalk_spring.service.impl;
 
 import com.UPT.uptalk_spring.model.MessageMetaData;
 import com.UPT.uptalk_spring.model.User;
-import com.UPT.uptalk_spring.model.UserInfo;
 import com.UPT.uptalk_spring.service.IRoomService;
 import com.UPT.uptalk_spring.utils.websocket.MessageMetaDataUtil;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -24,8 +21,6 @@ import java.util.Map;
  */
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Slf4j
 public class RoomServiceImpl implements IRoomService {
     private int id;
