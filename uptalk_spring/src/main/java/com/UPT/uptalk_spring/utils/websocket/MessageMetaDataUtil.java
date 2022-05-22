@@ -40,9 +40,10 @@ public class MessageMetaDataUtil {
         MessageMetaData result = new MessageMetaData();
         try {
             result = mapper.readValue(message, MessageMetaData.class);
+            return result;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            return null;
         }
-        return result;
     }
 }

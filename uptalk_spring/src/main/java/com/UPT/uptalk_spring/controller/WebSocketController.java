@@ -4,15 +4,18 @@ import com.UPT.uptalk_spring.model.MessageMetaData;
 import com.UPT.uptalk_spring.model.MessageType;
 import com.UPT.uptalk_spring.model.UserInfo;
 import com.UPT.uptalk_spring.service.ISessionPoolService;
+import com.UPT.uptalk_spring.service.impl.SessionPoolServiceImpl;
 import com.UPT.uptalk_spring.utils.websocket.MessageMetaDataUtil;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
+import javax.annotation.Resource;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 
-import static com.UPT.uptalk_spring.model.MessageType.CreateRoom;
+import static com.UPT.uptalk_spring.model.MessageType.*;
 
 /**
  * @Title: WebSocketController
@@ -21,11 +24,19 @@ import static com.UPT.uptalk_spring.model.MessageType.CreateRoom;
  * @time: 2022/5/13
  */
 @Slf4j
-@NoArgsConstructor
-@ServerEndpoint("/websocket/{roomId}")
+@Controller
+@ServerEndpoint("/api/websocket")
 public class WebSocketController {
 
-    ISessionPoolService sessionPoolService;
+    private static ISessionPoolService sessionPoolService;
+
+    @Autowired
+    public WebSocketController(ISessionPoolService sessionPoolService) {
+        this.sessionPoolService = sessionPoolService;
+    }
+
+    public WebSocketController() {
+    }
 
     /**
      * 接收message的方法
@@ -35,31 +46,69 @@ public class WebSocketController {
      */
     @OnMessage
     public void onMessage(String message, Session session) throws IOException, InterruptedException {
+
         MessageMetaData messageMetaData = MessageMetaDataUtil.decodeMessageMetaData(message);
-        log.info(session.getId() + ":接收到訊息:" + messageMetaData);
-        MessageType messageMetaDataType = messageMetaData.getType();
-        String messageMetaDataTextMessage = messageMetaData.getMessage();
-        switch (messageMetaDataType) {
-            case CreateRoom:
-                int roomId = sessionPoolService.createRoom(session);
-                this.sendCommand(session, CreateRoom, String.valueOf(roomId));
-                break;
-            case JoinRoom:
-                int roomId2 = Integer.parseInt(messageMetaDataTextMessage);
-                sessionPoolService.joinRoom(session, roomId2);
-                break;
-            case QuitRoom:
-                sessionPoolService.quitRoom(session);
-                break;
-            case JoinQueue:
-                sessionPoolService.joinQueue(session);
-                break;
-            case LeaveQueue:
-                sessionPoolService.leaveQueue(session);
-                break;
-            case Text:
-                sessionPoolService.sendMessage(session, messageMetaData);
-                break;
+        if(messageMetaData==null){
+            log.warn(session.getId() +":未定義命令類型");
+            this.sendCommand(session,UndefinedType,"fail");
+        }else{
+            log.info(session.getId() + ":接收到訊息:" + messageMetaData.toString());
+            MessageType messageMetaDataType = messageMetaData.getType();
+            String messageMetaDataTextMessage = messageMetaData.getMessage();
+            switch (messageMetaDataType) {
+                case CreateRoom:
+                    Integer roomId = sessionPoolService.createRoom(session);
+                    if (roomId != null) {
+                        this.sendCommand(session, CreateRoom, String.valueOf(roomId));
+                    } else {
+                        log.warn(session.getId()+":CreateRoom失敗");
+                        this.sendCommand(session, CreateRoom, "fail");
+                    }
+                    break;
+                case JoinRoom:
+                    int roomId2 = Integer.parseInt(messageMetaDataTextMessage);
+                    if (sessionPoolService.joinRoom(session, roomId2)) {
+                        this.sendCommand(session, JoinRoom, "success");
+                    } else {
+                        log.warn(session.getId()+":JoinRoom失敗");
+                        this.sendCommand(session, JoinRoom, "fail");
+                    }
+                    break;
+                case QuitRoom:
+                    if (sessionPoolService.quitRoom(session)) {
+                        this.sendCommand(session, QuitRoom, "success");
+                    } else {
+                        log.warn(session.getId()+":QuitRoom失敗");
+                        this.sendCommand(session, QuitRoom, "fail");
+                    }
+                    break;
+                case JoinQueue:
+                    if (sessionPoolService.joinQueue(session)) {
+                        this.sendCommand(session, JoinQueue, "success");
+                    } else {
+                        log.warn(session.getId()+":JoinQueue失敗");
+                        this.sendCommand(session, JoinQueue, "fail");
+                    }
+                    break;
+                case LeaveQueue:
+                    if (sessionPoolService.leaveQueue(session)) {
+                        this.sendCommand(session, LeaveQueue, "success");
+                    } else {
+                        log.warn(session.getId()+":LeaveQueue失敗");
+                        this.sendCommand(session, LeaveQueue, "fail");
+                    }
+                    break;
+                case Text:
+                    if (sessionPoolService.sendMessage(session, messageMetaData)) {
+                        this.sendCommand(session, Text, "success");
+                    } else {
+                        log.warn(session.getId()+":Text失敗");
+                        this.sendCommand(session, Text, "fail");
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -69,7 +118,8 @@ public class WebSocketController {
     @OnOpen
     public void onOpen(Session session) {
         log.info(session.getId() + ":連線開啟");
-        sessionPoolService.addUser(session, new UserInfo());
+        UserInfo userInfo = new UserInfo(1l, "test", "test", "test", true);
+        sessionPoolService.addUser(session, userInfo);
     }
 
     /**

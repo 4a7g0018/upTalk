@@ -12,13 +12,13 @@ public interface ISessionPoolService {
 
     public Integer createRoom(Session session);
 
-    public void joinRoom(Session session, int roomId);
+    public Boolean joinRoom(Session session, int roomId);
 
-    public void quitRoom(Session session);
+    public Boolean quitRoom(Session session);
 
-    public void sendMessage(Session session, MessageMetaData messageMetaData);
+    public Boolean sendMessage(Session session, MessageMetaData messageMetaData);
 
-    public void joinQueue(Session session);
+    public Boolean joinQueue(Session session);
 
-    public void leaveQueue(Session session);
+    public Boolean leaveQueue(Session session);
 }
