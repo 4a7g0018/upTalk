@@ -6,3 +6,4 @@
 /.idea
 /uptalk_vue/node_modules
 /uptalk_spring/target
+/uptalk_spring/.sql

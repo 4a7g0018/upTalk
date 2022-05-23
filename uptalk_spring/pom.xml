@@ -9,10 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.UPT</groupId>
-	<artifactId>uptalk_spring</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>uptalk</artifactId>
+	<version>latest</version>
 	<name>uptalk_spring</name>
 	<description>uptalk spring boot</description>
+	<packaging>war</packaging>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
@@ -71,6 +72,11 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.19.2</version>
 		</dependency>
 		<!-- send email -->
 		<dependency>
