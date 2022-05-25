@@ -1,7 +1,7 @@
 #產生image
 
 # stage-0 第零階段
-FROM uptalk-maven:latest AS maven
+FROM maven:3.8.5-jdk-8-slim AS maven
 
 # 工作目錄
 WORKDIR /build
