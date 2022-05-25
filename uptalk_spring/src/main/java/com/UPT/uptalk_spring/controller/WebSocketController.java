@@ -118,7 +118,7 @@ public class WebSocketController {
     @OnOpen
     public void onOpen(Session session) {
         log.info(session.getId() + ":連線開啟");
-        UserInfo userInfo = new UserInfo(1l, "test", "test", "test", true);
+        UserInfo userInfo = new UserInfo("test", "test", "test", true, null);
         sessionPoolService.addUser(session, userInfo);
     }
 
