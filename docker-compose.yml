@@ -20,10 +20,11 @@ services:
     container_name: uptalk_postgres
     image: postgres:14-alpine
     ports:
-      - "5432:5432"
+      - "61234:5432"
     environment:
       - POSTGRES_PASSWORD=123456
       - POSTGRES_USER=postgres
+      - POSTGRES_DB=up_talk
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - ./.sql:/var/lib/postgresql/data

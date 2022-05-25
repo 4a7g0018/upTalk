@@ -1,6 +1,6 @@
 #產生image
 
-# stage-0 第零階段
+# stage-1 第零階段
 FROM maven:3.8.5-jdk-8-slim AS maven
 
 # 工作目錄
@@ -10,8 +10,7 @@ WORKDIR /build
 COPY . /build
 
 # 編譯為 war
-RUN mvn clean
-RUN mvn install
+RUN mvn clean install
 
 # stage-1 第一階段
 FROM tomcat:9.0.63-jre8 AS build-tomcat
