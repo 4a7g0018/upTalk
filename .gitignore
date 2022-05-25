@@ -1,10 +1,12 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+
 # Editor-based HTTP Client requests
 /httpRequests/
 /.idea
 /uptalk_vue/node_modules
 /uptalk_spring/target
-/uptalk_spring/.sql
-/uptalk_spring/uptalk_spring.iml
+
+# SQL
+.sql/
