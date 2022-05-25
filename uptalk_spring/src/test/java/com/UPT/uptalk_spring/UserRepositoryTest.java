@@ -32,29 +32,35 @@ public class UserRepositoryTest {
 
     @Test
     public void saveTest() {
-        Role member = new Role("member");
-        Role admin = new Role("admin");
-        this.roleRepository.save(member);
-        this.roleRepository.save(admin);
+        String name="name";
+        String email = "email";
+        String password = "1234";
+        String memberName="member";
+        String adminName="admin";
 
-        Collection<Role> roles = new ArrayList<>();
-        roles.add(member);
-        roles.add(admin);
+        Role roleMember = roleRepository.findRoleByName(memberName);
+        Role roleAdmin = roleRepository.findRoleByName(adminName);
+        UserInfo userInfo = userRepository.findUserInfoByEmail(email);
 
-        UserInfo user = UserInfo.builder()
-                .id(UUID.randomUUID())
-                .name("name")
-                .email("email")
-                .password("1234")
-                .enable(true)
-                .roles(roles).build();
+        if (userInfo==null && roleMember==null && roleAdmin==null){
+            Role member = new Role(memberName);
+            Role admin = new Role(adminName);
+            this.roleRepository.save(member);
+            this.roleRepository.save(admin);
 
-        this.userRepository.save(user);
-    }
+            Collection<Role> roles = new ArrayList<>();
+            roles.add(member);
+            roles.add(admin);
 
-    @Test
-    public void findUserTest() {
-//        UserInfo user = this.userRepository.findUserInfoByEmail("email");
-//        log.info("user : {}",user);
+            UserInfo user = UserInfo.builder()
+                    .id(UUID.randomUUID())
+                    .name(name)
+                    .email(email)
+                    .password(password)
+                    .enable(true)
+                    .roles(roles).build();
+
+            this.userRepository.save(user);
+        }
     }
 }
