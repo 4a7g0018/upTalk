@@ -1,34 +1,46 @@
 version: '3.8'
 
 services:
-  frontend-dev:
+  frontend:
     restart: always
-    container_name: uptalk_frontend_dev
+    container_name: uptalk_frontend
     image: uptalk-frontend
     build:
       context: uptalk_vue
-      dockerfile: .docker/Dockerfile
+      dockerfile: Dockerfile
     ports:
-      - "8080:8080"
-    volumes:
-      - ./uptalk_vue:/app/frontend
-      - /app/frontend/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-  postgres-dev:
+      - "80:80"
+    depends_on:
+      - postgres
+      - tomcat
+    networks:
+      - uptalk
+  postgres:
     restart: always
     container_name: uptalk_postgres
-    image: postgres:14.2-bullseye
+    image: postgres:14-alpine
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_PASSWORD=Oil6273
-      - POSTGRES_USER=uptalk
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=postgres
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - ./.sql:/var/lib/postgresql/data
-  tomcat-dev:
-    container_name: uptalk_tomcat
-    image: tomcat:8.5.78-jre8-openjdk-slim-buster
+    networks:
+      - uptalk
+  tomcat:
+    restart: always
+    container_name: uptalk_backend
+    image: uptalk-backend
+    build: 
+      context: uptalk_spring
+      dockerfile: Dockerfile
     ports:
-      - "8964:8080"
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+networks:
+  uptalk:
+
