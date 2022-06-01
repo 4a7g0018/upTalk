@@ -1,27 +1,24 @@
-#產生image
-
-# stage-1 第零階段
-FROM maven:3.8.5-jdk-8-slim AS maven
+# syntax = docker/dockerfile:experimental
+# stage-0
+FROM maven:3.8.5-jdk-8-slim AS builder
 
 # 工作目錄
 WORKDIR /build
-
-# 複製專案
 COPY . /build
 
-# 編譯為 war
-RUN mvn clean install
+# 複製專案 > 編譯為 war
+RUN --mount=type=cache,target=/root/.m2,id=mvn_cache,sharing=locked \
+    mvn dependency:go-offline package -Dmaven.test.skip=true
 
-# stage-1 第一階段
-FROM tomcat:9.0.63-jre8 AS build-tomcat
+# stage-2
+FROM tomcat:9.0.63-jre8 AS uptalk-backend
 
 # 提換為預設的 Tomcat 模板
-RUN rm -r /usr/local/tomcat/webapps && cp -r /usr/local/tomcat/webapps.dist /usr/local/tomcat/webapps
-RUN rm -rf /usr/local/tomcat/conf/server.xml
-COPY server.xml /usr/local/tomcat/conf
+RUN rm -r /usr/local/tomcat/webapps.dist
 
-# 複製 war 檔 "/build/target/uptalk-latest.war"
-COPY --from=maven /build/target/uptalk-latest.war /usr/local/tomcat/webapps/uptalk.war
+# # 複製 war 檔 "/build/target/uptalk-latest.war"
+COPY --from=builder /build/target/uptalk-latest.war /usr/local/tomcat/webapps/uptalk.war
+COPY server.xml /usr/local/tomcat/conf/server.xml
 
-# 曝露端口
+# # 曝露端口
 EXPOSE 8080

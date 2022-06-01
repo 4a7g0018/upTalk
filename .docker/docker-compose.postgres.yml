@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  postgres:
+    restart: always
+    container_name: uptalk_postgres
+    image: postgres:14-alpine
+    ports:
+      - "61234:5432"
+    environment:
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=up_talk
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - uptalk
+
+volumes:
+  postgres-data:
+    name: postgres-data
+
+networks:
+  uptalk:
+    name: uptalk
+

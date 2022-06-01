@@ -1,0 +1,16 @@
+# Mavne
+mvnw
+mvnw.cmd
+/target
+
+# Other
+HELP.md
+*/**/application.properties.*
+
+# IDE
+.idea/
+.vscode/
+uptalk_spring.iml
+
+# Dockerfile
+Dockerfile

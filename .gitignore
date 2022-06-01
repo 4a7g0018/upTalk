@@ -1,12 +1,22 @@
+# IDE
+.vscode/
+*/**/.vscode/
+*/**/.idea/
+*/**/*.iml
+
+# Maven
+*/**/target/
+
+# NodeJS
+*/**/node_modules
+*/**/package-lock.json
+
 # Default ignored files
 /shelf/
 /workspace.xml
 
 # Editor-based HTTP Client requests
 /httpRequests/
-/.idea
-/uptalk_vue/node_modules
-/uptalk_spring/target
 
 # SQL
 .sql/

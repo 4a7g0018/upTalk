@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  tomcat:
+    restart: always
+    container_name: uptalk_backend
+    image: wenwen357951/uptalk-backend
+    build:
+      context: uptalk_spring
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - uptalk
+
+networks:
+  uptalk:
+    name: uptalk

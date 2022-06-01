@@ -1,0 +1,13 @@
+# NodeJS
+node_modules/
+package-lock.json
+
+# Other
+README.md
+
+# IDEA
+.idea/
+.vscode/
+
+# Docker 
+Dockerfile
