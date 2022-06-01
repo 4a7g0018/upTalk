@@ -1,6 +1,10 @@
 name: discord-notification-start
 kind: pipeline
 type: docker
+trigger:
+  event:
+    exclude:
+      - pull_request
 
 steps:
   - name: title-message
@@ -22,6 +26,13 @@ kind: pipeline
 type: docker
 depends_on:
   - discord-notification-start
+
+trigger:
+  branch:
+    - master
+    - develop_vue
+    - release
+
 
 steps:
   - name: test-and-build
@@ -48,7 +59,7 @@ steps:
       webhook_token:
         from_secret: discord_webhook_token
       message: |
-        ⚠️ #{{build.number}} 前端建置失敗，請修復問題。 ⚠️
+        ⚠️ #{{build.number}} 前端建置與測試失敗，請修復問題。 ⚠️
 
 volumes:
   - name: uptalk-nodejs-modules
@@ -58,16 +69,19 @@ volumes:
     host:
       path: /var/lib/cache/.npm
 
-trigger:
-  branch:
-    - master
-
 ---
 name: backend
 kind: pipeline
 type: docker
 depends_on:
   - discord-notification-start
+
+trigger:
+  branch:
+    - master
+    - develop
+    - feature/*
+    - release
 
 steps:
   - name: test-and-build
@@ -93,7 +107,7 @@ steps:
       webhook_token:
         from_secret: discord_webhook_token
       message: |
-        ⚠️ #{{build.number}} 後端建置失敗，請修復問題。 ⚠️
+        ⚠️ #{{build.number}} 後端建置與測試失敗，請修復問題。 ⚠️
 
 volumes:
   - name: uptalk-maven-cache
@@ -111,10 +125,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: up_talk
 
-trigger:
-  branch:
-    - master
-
 ---
 name: sonarqube
 kind: pipeline
@@ -123,9 +133,15 @@ depends_on:
   - frontend
   - backend
 
+trigger:
+  event:
+    - push
+  branch:
+    - master
+
 steps:
   - name: code-analysis
-    image: aosapps/drone-sonar-plugin
+    image: wenwen357951/drone-sonar-plugin:latest
     volumes:
       - name: sonar-data
         path: /root/.sonar
@@ -166,6 +182,16 @@ kind: pipeline
 type: docker
 depends_on:
   - sonarqube
+
+trigger:
+  event:
+    - push
+    - cron
+  cron:
+    - daily-build-and-test
+  branch:
+    - master
+    - release
 
 steps:
   - name: frontend
@@ -225,7 +251,6 @@ steps:
       webhook_token:
         from_secret: discord_webhook_token
       message: |
-        花費時間: {{since build.started}}
         {{#success build.status}}
         🎉 #{{build.number}} 建置完成，已發布至 DockerHub 上。 🎉
         {{else}}
@@ -248,3 +273,28 @@ volumes:
   - name: uptalk-nodejs-cache
     host:
       path: /var/lib/cache/.npm
+
+---
+name: discord-notification-end
+kind: pipeline
+type: docker
+depends_on:
+  - publisher
+
+trigger:
+  event:
+    exclude:
+      - pull_request
+
+steps:
+  - name: success-message
+    image: appleboy/drone-discord
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_token
+      message: |
+        花費時間: {{since build.started}}
+        #{{build.number}} Done.
+        ---
