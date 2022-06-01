@@ -1,0 +1,250 @@
+name: discord-notification-start
+kind: pipeline
+type: docker
+
+steps:
+  - name: title-message
+    image: appleboy/drone-discord
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_token
+      message: |
+        ---
+        🚩 接收到來自 {{repo.name}} {{build.event}} 事件 🚩
+        🏗️ New Job #{{build.number}}
+        {{build.link}}
+
+---
+name: frontend
+kind: pipeline
+type: docker
+depends_on:
+  - discord-notification-start
+
+steps:
+  - name: test-and-build
+    image: node:lts-alpine
+    volumes:
+      - name: uptalk-nodejs-modules
+        path: /drone/src/uptalk_vue/node_modules
+      - name: uptalk-nodejs-cache
+        path: /root/.npm
+    commands:
+      - cd uptalk_vue
+      - npm install
+      - npm run test:unit
+      - npm run build
+
+  - name: failed-message
+    image: appleboy/drone-discord
+    when:
+      status:
+        - failure
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_token
+      message: |
+        ⚠️ #{{build.number}} 前端建置失敗，請修復問題。 ⚠️
+
+volumes:
+  - name: uptalk-nodejs-modules
+    host:
+      path: /var/lib/cache/node_modules
+  - name: uptalk-nodejs-cache
+    host:
+      path: /var/lib/cache/.npm
+
+trigger:
+  branch:
+    - master
+
+---
+name: backend
+kind: pipeline
+type: docker
+depends_on:
+  - discord-notification-start
+
+steps:
+  - name: test-and-build
+    image: maven:3.8.5-jdk-8-slim
+    volumes:
+      - name: uptalk-maven-cache
+        path: /root/.m2
+      - name: uptalk-backend-target
+        path: /drone/src/uptalk_spring/target
+    commands:
+      - cd uptalk_spring
+      - rm -rf /drone/src/uptalk_spring/target/*
+      - mvn package
+
+  - name: failed-message
+    image: appleboy/drone-discord
+    when:
+      status:
+        - failure
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_token
+      message: |
+        ⚠️ #{{build.number}} 後端建置失敗，請修復問題。 ⚠️
+
+volumes:
+  - name: uptalk-maven-cache
+    host:
+      path: /var/lib/cache/.m2
+  - name: uptalk-backend-target
+    host:
+      path: /var/lib/cache/uptalk/target
+
+services:
+  - name: postgres
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+      POSTGRES_DB: up_talk
+
+trigger:
+  branch:
+    - master
+
+---
+name: sonarqube
+kind: pipeline
+type: docker
+depends_on:
+  - frontend
+  - backend
+
+steps:
+  - name: code-analysis
+    image: aosapps/drone-sonar-plugin
+    volumes:
+      - name: sonar-data
+        path: /root/.sonar
+      - name: uptalk-backend-target
+        path: /drone/src/uptalk_spring/target
+    settings:
+      sonar_host:
+        from_secret: sonar_host
+      sonar_token:
+        from_secret: sonar_token
+      exclusions: "**/dist/**/*.js,**/node_modules/**,**/規格書/**"
+      usingProperties: true
+
+  - name: failed-message
+    image: appleboy/drone-discord
+    when:
+      status:
+        - failure
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_token
+      message: |
+        ⚠️ #{{build.number}} 程式碼品質分析發生問題，請差看問題。 ⚠️
+
+volumes:
+  - name: sonar-data
+    host:
+      path: /var/lib/cache/.sonar
+  - name: uptalk-backend-target
+    host:
+      path: /var/lib/cache/uptalk/target
+
+---
+name: publisher
+kind: pipeline
+type: docker
+depends_on:
+  - sonarqube
+
+steps:
+  - name: frontend
+    image: plugins/docker:20.12
+    environment:
+      DOCKER_BUILDKIT: 1
+    volumes:
+      - name: uptalk-nodejs-modules
+        path: /drone/src/uptalk_vue/node_modules
+      - name: uptalk-nodejs-cache
+        path: /root/.npm
+      - name: docker-sock
+        path: /var/run/docker.sock
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_token
+      repo: wenwen357951/uptalk-frontend
+      tags: latest
+      dockerfile: /drone/src/uptalk_vue/Dockerfile
+      context: /drone/src/uptalk_vue
+      experimental: true
+
+  - name: backend
+    image: plugins/docker:20.12
+    environment:
+      DOCKER_BUILDKIT: 1
+    volumes:
+      - name: uptalk-maven-cache
+        path: /root/.m2
+      - name: docker-sock
+        path: /var/run/docker.sock
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_token
+      repo: wenwen357951/uptalk-backend
+      tags: latest
+      dockerfile: /drone/src/uptalk_spring/Dockerfile
+      context: /drone/src/uptalk_spring
+      experimental: true
+
+  - name: success-message
+    image: appleboy/drone-discord
+    depends_on:
+      - frontend
+      - backend
+    when:
+      status:
+        - success
+        - failure
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_token
+      message: |
+        花費時間: {{since build.started}}
+        {{#success build.status}}
+        🎉 #{{build.number}} 建置完成，已發布至 DockerHub 上。 🎉
+        {{else}}
+        ⚠️ #{{build.number}} 發布失敗，請差看問題。 ⚠️
+        {{/success}}
+
+volumes:
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
+  - name: uptalk-maven-cache
+    host:
+      path: /var/lib/cache/.m2
+  - name: uptalk-backend-target
+    host:
+      path: /var/lib/cache/uptalk/target
+  - name: uptalk-nodejs-modules
+    host:
+      path: /var/lib/cache/node_modules
+  - name: uptalk-nodejs-cache
+    host:
+      path: /var/lib/cache/.npm
