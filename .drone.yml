@@ -150,7 +150,7 @@ steps:
       webhook_token:
         from_secret: discord_webhook_token
       message: |
-        ⚠️ #{{build.number}} 程式碼品質分析發生問題，請差看問題。 ⚠️
+        ⚠️ #{{build.number}} 程式碼品質分析發生問題，請查看問題。 ⚠️
 
 volumes:
   - name: sonar-data
@@ -229,7 +229,7 @@ steps:
         {{#success build.status}}
         🎉 #{{build.number}} 建置完成，已發布至 DockerHub 上。 🎉
         {{else}}
-        ⚠️ #{{build.number}} 發布失敗，請差看問題。 ⚠️
+        ⚠️ #{{build.number}} 發佈失敗，請查看問題。 ⚠️
         {{/success}}
 
 volumes:
